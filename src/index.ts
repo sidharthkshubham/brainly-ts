@@ -1,9 +1,10 @@
 import express from "express";
 import { Request, Response } from "express";
-import { User } from "./db";
+import { User,Content } from "./db";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
+import { usermiddleware } from "./middleware";
 const JWT_SECRET="kjdsfkjdskjflkdsjfkldsjf";
 const app = express();
 app.use(express.json());
@@ -64,6 +65,34 @@ app.post("/api/v1/login",async (req:Request, res:Response): Promise<any> => {
     }
   });
   
+  app.post("/api/v1/content",usermiddleware,async(req,res) :Promise<any>=>{
+    const {link,type}=req.body;
+    try {
+        await Content.create({
+            link:link,
+            tag:type,
+            //@ts-ignore
+            user:req.userId
+        })
+        return res.status(201).json({
+            message:"content added sucessfully"
+        })
+    } catch (error) {
+        
+    }
+    
+  })
+
+  app.get("/api/v1/content",usermiddleware,async(req,res):Promise<any>=>{
+    //@ts-ignore
+    const userId=req.userId;
+    const content=await Content.find({
+        user:userId
+    }).populate("user")
+    return res.json({
+        content
+    })
+  })
 
 async function main() {
   app.listen(3098);
