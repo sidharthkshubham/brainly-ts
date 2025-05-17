@@ -93,6 +93,23 @@ app.post("/api/v1/login",async (req:Request, res:Response): Promise<any> => {
         content
     })
   })
+  app.delete("/api/v1/content",usermiddleware,async(req,res):Promise<any>=>{
+    //@ts-ignore
+    try {
+        const id=req.body.id;
+    await Content.deleteMany({
+        _id:id
+    })
+    return res.json({
+        message:"deleted successfully"
+    })
+        
+    } catch (error) {
+        console.log(error)
+    }
+    
+
+  })
 
 async function main() {
   app.listen(3098);
